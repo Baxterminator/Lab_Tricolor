@@ -14,7 +14,7 @@ namespace lab_tricolor {
 
     using namespace rclcpp;
 
-    enum Step {
+    enum class Step {
         IDLE,
         T_SOURCE,
         CENTERING,
@@ -30,16 +30,15 @@ namespace lab_tricolor {
 
         }
     protected:
-        void init();
         /*
          * ################################################################
          *                          Step Management
          * ################################################################
          */
-        Step check_step(int n_step) override {
-            if (n_step > RELEASE)
-                return IDLE;
-            return static_cast<Step>(n_step);
+        Step check_step(Step act_step) override {
+            if (act_step == Step::RELEASE)
+                return Step::IDLE;
+            return act_step;
         }
 
         /*
@@ -49,21 +48,21 @@ namespace lab_tricolor {
          */
         // Map of function to use for checking and acting at each step
         const std::map<Step, cfunc> check_map = {
-                {IDLE, [this] () { return checkIdle();}},
-                {T_SOURCE, [this] () { return checkTSource(); }},
-                {CENTERING, [this] () { return checkCentering(); }},
-                {APPROACH, [this] () { return checkApproach(); }},
-                {GRIP, [this] () { return checkGrip(); }},
-                {T_DEST, [this] () { return checkTDest(); }},
-                {RELEASE, [this] () { return checkRelease(); }},
+                {Step::IDLE, [this] () { return checkIdle();}},
+                {Step::T_SOURCE, [this] () { return checkTSource(); }},
+                {Step::CENTERING, [this] () { return checkCentering(); }},
+                {Step::APPROACH, [this] () { return checkApproach(); }},
+                {Step::GRIP, [this] () { return checkGrip(); }},
+                {Step::T_DEST, [this] () { return checkTDest(); }},
+                {Step::RELEASE, [this] () { return checkRelease(); }},
         };
         const std::map<Step, afunc> action_map = {
-                {T_SOURCE, [this] () { return actionTSource();}},
-                {CENTERING, [this] () { return actionCentering();}},
-                {APPROACH, [this] () { return actionApproach();}},
-                {GRIP, [this] () { return actionGrip();}},
-                {T_DEST, [this] () { return actionTDest();}},
-                {RELEASE, [this] () { return actionRelease();}},
+                {Step::T_SOURCE, [this] () { return actionTSource();}},
+                {Step::CENTERING, [this] () { return actionCentering();}},
+                {Step::APPROACH, [this] () { return actionApproach();}},
+                {Step::GRIP, [this] () { return actionGrip();}},
+                {Step::T_DEST, [this] () { return actionTDest();}},
+                {Step::RELEASE, [this] () { return actionRelease();}},
         };
 
         /*
@@ -75,19 +74,19 @@ namespace lab_tricolor {
         bool checkIdle() {
             return false;
         }
-        bool checkTSource();
-        bool checkCentering();
-        bool checkApproach();
-        bool checkGrip();
-        bool checkTDest();
-        bool checkRelease();
+        virtual bool checkTSource() = 0;
+        virtual bool checkCentering() = 0;
+        virtual bool checkApproach() = 0;
+        virtual bool checkGrip() = 0;
+        virtual bool checkTDest() = 0;
+        virtual bool checkRelease() = 0;
 
-        void actionTSource();
-        void actionCentering();
-        void actionApproach();
-        void actionGrip();
-        void actionTDest();
-        void actionRelease();
+        virtual void actionTSource() = 0;
+        virtual void actionCentering() = 0;
+        virtual void actionApproach() = 0;
+        virtual void actionGrip() = 0;
+        virtual void actionTDest() = 0;
+        virtual void actionRelease() = 0;
     };
 
 }

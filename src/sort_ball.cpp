@@ -6,101 +6,109 @@
 
 namespace lab_tricolor {
 
-    /**
-     * Initialize everything you need from the start here
-     */
-    void SortBall::init() {
+    class LabNode : public SortBall {
+    public:
+        LabNode(NodeOptions opts) : SortBall(opts) {
 
-    }
+        }
+    protected:
+        bool checkTSource();
+        bool checkCentering();
+        bool checkApproach();
+        bool checkGrip();
+        bool checkTDest();
+        bool checkRelease();
+
+        void actionTSource();
+        void actionCentering();
+        void actionApproach();
+        void actionGrip();
+        void actionTDest();
+        void actionRelease();
+    };
 
     /**
      * Check whether the robot is at the source point or not
      */
-    bool SortBall::checkTSource() {
+    bool LabNode::checkTSource() {
         return false;
+    }
+    /**
+     * Compute the next action to do during the translation to the source
+     */
+    void LabNode::actionTSource() {
+
     }
 
     /**
      * Check whether the ball is centered on the camera image
      */
-    bool SortBall::checkCentering() {
+    bool LabNode::checkCentering() {
         return false;
+    }
+    /**
+     * Describe the centering action
+     */
+    void LabNode::actionCentering() {
+
     }
 
     /**
      * Check whether the robot is at the next point for the approaching phase
      */
-    bool SortBall::checkApproach() {
+    bool LabNode::checkApproach() {
         return false;
+    }
+    /**
+     * Describe the approach to the ball
+     */
+    void LabNode::actionApproach() {
+
     }
 
     /**
      * Check whether the robot has gripped the ball or not
      */
-    bool SortBall::checkGrip() {
+    bool LabNode::checkGrip() {
         return false;
+    }
+    /**
+     * Describe the gripping action
+     */
+    void LabNode::actionGrip() {
+
     }
 
     /**
      * Check whether the robot is at the destination point or not
      */
-    bool SortBall::checkTDest() {
+    bool LabNode::checkTDest() {
         return false;
+    }
+    /**
+     * Describe the movement to the destination box
+     */
+    void LabNode::actionTDest() {
+
     }
 
     /**
      * Check whether the robot has release the ball or not
      */
-    bool SortBall::checkRelease() {
+    bool LabNode::checkRelease() {
         return false;
     }
-
-    /**
-     * Compute the next action to do during the translation to the source
-     */
-    void SortBall::actionTSource() {
-
-    }
-
-    /**
-     * Describe the centering action
-     */
-    void SortBall::actionCentering() {
-
-    }
-
-    /**
-     * Describe the approach to the ball
-     */
-    void SortBall::actionApproach() {
-
-    }
-
-    /**
-     * Describe the gripping action
-     */
-    void SortBall::actionGrip() {
-
-    }
-
-    /**
-     * Describe the movement to the destination box
-     */
-    void SortBall::actionTDest() {
-
-    }
-
     /**
      * Describe the release action
      */
-    void SortBall::actionRelease() {
+    void LabNode::actionRelease() {
 
     }
 }
 
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<lab_tricolor::SortBall>(rclcpp::NodeOptions{}));
+    rclcpp::spin(std::make_shared<lab_tricolor::LabNode>(rclcpp::NodeOptions{}));
     rclcpp::shutdown();
     return 0;
 }

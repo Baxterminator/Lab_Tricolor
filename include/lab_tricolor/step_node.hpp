@@ -51,8 +51,8 @@ namespace lab_tricolor {
             action(step);
         }
     protected:
-        virtual E check_step(int n_step) = 0;
-        inline void increment_step() { step = check_step(step+1); }
+        virtual E check_step(E act_step) = 0;
+        inline void increment_step() { step = check_step(step); }
         std::map<E, cfunc> check_map = std::map<E, cfunc>();
         std::map<E, afunc> action_map = std::map<E, afunc>();
     };
