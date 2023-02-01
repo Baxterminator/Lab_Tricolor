@@ -17,7 +17,7 @@ namespace lab_tricolor {
      * Check whether the robot is at the source point or not
      */
     bool SortBall::checkTSource() {
-
+        return false;
     }
 
     /**

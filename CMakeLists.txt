@@ -8,15 +8,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies()
 
-add_executable(sort_ball
-        src/sort_ball.cpp)
-target_include_directories(sort_ball
-        PRIVATE include)
-ament_target_dependencies(sort_ball
-        rclcpp)
+ament_auto_add_executable(sort_ball src/sort_ball.cpp)
+target_include_directories(sort_ball PRIVATE include)
 
 install(TARGETS sort_ball
         DESTINATION lib/${PROJECT_NAME})

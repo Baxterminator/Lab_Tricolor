@@ -73,7 +73,7 @@ namespace lab_tricolor {
          */
         // TODO: To implement
         bool checkIdle() {
-
+            return false;
         }
         bool checkTSource();
         bool checkCentering();
@@ -90,6 +90,6 @@ namespace lab_tricolor {
         void actionRelease();
     };
 
-};
+}
 
 #endif //BUILD_SORT_BALL_H
