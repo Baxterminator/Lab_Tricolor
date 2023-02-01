@@ -14,7 +14,4 @@ ament_auto_find_build_dependencies()
 ament_auto_add_executable(sort_ball src/sort_ball.cpp)
 target_include_directories(sort_ball PRIVATE include)
 
-install(TARGETS sort_ball
-        DESTINATION lib/${PROJECT_NAME})
-
 ament_package()
