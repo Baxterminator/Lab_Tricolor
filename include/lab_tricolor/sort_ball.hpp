@@ -6,10 +6,9 @@
 #define BUILD_SORT_BALL_H
 
 #include "rclcpp/rclcpp.hpp"
-#include "lab_tricolor/step_node.hpp"
-#include "step_node.hpp"
-
+#include "ecn_baxter/game/step_node.hpp"
 #include <map>
+
 namespace lab_tricolor {
 
     using namespace rclcpp;
@@ -24,7 +23,7 @@ namespace lab_tricolor {
         RELEASE
     };
 
-    class SortBall : public StepNode<Step> {
+    class SortBall : public ECNBaxter::StepNode<Step> {
     public:
         explicit SortBall(NodeOptions opts) : StepNode<Step>("sort_ball", opts) {
 
@@ -35,7 +34,7 @@ namespace lab_tricolor {
          *                          Step Management
          * ################################################################
          */
-        Step check_step(Step act_step) override {
+        Step check_step(Step act_step) {
             if (act_step == Step::RELEASE)
                 return Step::IDLE;
             return act_step;
@@ -47,7 +46,7 @@ namespace lab_tricolor {
          * ################################################################
          */
         // Map of function to use for checking and acting at each step
-        const std::map<Step, cfunc> check_map = {
+        const std::map<Step, ECNBaxter::cfunc> check_map = {
                 {Step::IDLE, [this] () { return checkIdle();}},
                 {Step::T_SOURCE, [this] () { return checkTSource(); }},
                 {Step::CENTERING, [this] () { return checkCentering(); }},
@@ -56,7 +55,7 @@ namespace lab_tricolor {
                 {Step::T_DEST, [this] () { return checkTDest(); }},
                 {Step::RELEASE, [this] () { return checkRelease(); }},
         };
-        const std::map<Step, afunc> action_map = {
+        const std::map<Step, ECNBaxter::afunc> action_map = {
                 {Step::T_SOURCE, [this] () { return actionTSource();}},
                 {Step::CENTERING, [this] () { return actionCentering();}},
                 {Step::APPROACH, [this] () { return actionApproach();}},
