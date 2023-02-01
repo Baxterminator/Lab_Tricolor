@@ -50,6 +50,8 @@ namespace lab_tricolor {
      * Describe the centering action
      */
     void LabNode::actionCentering() {
+        static int x_center = 320 ; //x_offset: 320 -> 640/2
+        static int y_center = 200;  //y_offset: 200 -> 400/2
 
     }
 
