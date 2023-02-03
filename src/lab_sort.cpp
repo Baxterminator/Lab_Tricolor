@@ -1,7 +1,3 @@
-//
-// Created by gcote2021 on 26/01/23.
-//
-
 #include "lab_tricolor/sort_ball.hpp"
 
 namespace lab_tricolor {

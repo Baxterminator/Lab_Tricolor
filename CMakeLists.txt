@@ -11,8 +11,7 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
-ament_auto_add_executable(sort_ball src/sort_ball.cpp)
-
+ament_auto_add_executable(sort_ball src/lab_sort.cpp)
 target_include_directories(sort_ball PRIVATE include)
 
 ament_package()
