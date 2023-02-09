@@ -3,6 +3,8 @@
 //  <depend>kdl_parser</depend>
 
 
+#include "rclcpp/rclcpp.hpp"
+
 #include "lab_tricolor/sort_ball.hpp"
 #include <lab_tricolor/srv/jacobian.hpp>
 #include <kdl_parser/kdl_parser.hpp>

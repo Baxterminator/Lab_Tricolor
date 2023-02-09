@@ -127,6 +127,8 @@ namespace lab_tricolor {
         rclcpp::TimerBase::SharedPtr timer;
         std::string topic_circle;
 
+
+
         ServiceNodeSync<baxter_simple_sim::srv::Jacobian> jacobian_service_;
 
 
