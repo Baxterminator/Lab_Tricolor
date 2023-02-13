@@ -6,10 +6,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
-
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
+
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIRS})
+add_definitions(${EIGEN3_DEFINITIONS})
+find_package(orocos_kdl REQUIRED)
+#target_link_libraries(${PROJECT_NAME} orocos_kdl)
 
 rosidl_generate_interfaces(${PROJECT_NAME} "srv/Jacobian.srv")
 ament_export_dependencies(rosidl_default_runtime)
@@ -37,6 +42,7 @@ target_include_directories(sort_ball PRIVATE include)
 
 ament_auto_add_executable(jacobian src/jacobian.cpp)
 target_include_directories(jacobian PRIVATE include)
+target_link_libraries(jacobian orocos_kdl)
 add_message(jacobian)
 
 ament_package()

@@ -6,6 +6,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include "lab_tricolor/sort_ball.hpp"
+//#include "lab_tricolor/KDL_jacobian.hpp"
 #include <lab_tricolor/srv/jacobian.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/frames.hpp>
@@ -18,6 +19,7 @@
 #include <kdl/chainjnttojacsolver.hpp>
 #include <urdf/model.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <kdl/frames.hpp>
 
 
 
@@ -25,6 +27,29 @@
 using lab_tricolor::srv::Jacobian;
 using JacReq = Jacobian::Request::SharedPtr;
 using JacRes = Jacobian::Response::SharedPtr;
+
+//class Chain_fwd_solver_Baxter : public KDL::ChainFkSolverPos_recursive
+//{
+//public:
+//    int JntToCart(const KDL::JntArray& q_in, KDL::Frame& p_out, int segmentNr=-1){
+//        KDL::Rotation R = KDL::Rotation();
+//        KDL::Vector V = KDL::Vector();
+//        p_out = KDL::Frame(R, V);
+//    }
+//    int JntToCart(const KDL::JntArray& q_in, std::vector<KDL::Frame>& p_out, int segmentNr=-1){
+//        KDL::Rotation R = KDL::Rotation();
+//        KDL::Vector V = KDL::Vector();
+//        p_out = std::vector<KDL::Frame>({KDL::Frame(R, V)});
+//    }
+//};
+
+//int KDL::ChainFkSolverPos_recursive::JntToCart(const KDL::JntArray& q_in, KDL::Frame& p_out, int segmentNr){
+//    return 0;
+//}
+
+//int KDL::ChainFkSolverPos_recursive::JntToCart(const KDL::JntArray& q_in, std::vector<KDL::Frame>& p_out, int segmentNr){
+//    return 0;
+//}
 
 struct Solvers
 {
@@ -34,8 +59,10 @@ struct Solvers
   KDL::ChainIkSolverPos_NR ik_p;
   KDL::ChainJntToJacSolver jac;
 };
+
 Solvers::Solvers(const KDL::Chain &chain) : fwd{chain}, ik_v{chain}, ik_p{chain, fwd, ik_v}, jac{chain}
 {}
+
 std::unique_ptr<urdf::Model> initRSP()
 {
   const auto baxter_folder = ament_index_cpp::get_package_share_directory("baxter_description");
@@ -123,7 +150,7 @@ namespace lab_tricolor {
                     }
                 };
                 if(req->inverse)
-                    writeMatrix(J.data.completeOrthogonalDecomposition().pseudoInverse());
+                    int ije_sers_a_rien =0;//writeMatrix(J.data.completeOrthogonalDecomposition().pseudoInverse());
                 else
                     writeMatrix(J.data);
 
