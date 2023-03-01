@@ -14,8 +14,9 @@
   <depend>baxter_core_msgs</depend>
   <depend>std_msgs</depend>
   <depend>kdl_parser</depend>
+  <!--<depend>ament_index_cpp</depend>-->
 
-  <depend>baxter_simple_sim</depend>
+  <!--<depend>baxter_simple_sim</depend>-->
   <depend>frames</depend>
   <depend>urdf</depend>
   <depend> Orocos-KDL </depend>

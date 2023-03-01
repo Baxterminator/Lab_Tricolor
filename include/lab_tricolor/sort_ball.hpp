@@ -19,7 +19,7 @@
 #include "baxter_core_msgs/srv/solve_position_ik.hpp"
 
 #include <geometry_msgs/msg/twist.hpp>
-#include <baxter_simple_sim/srv/jacobian.hpp>
+//#include <lab_tricolor/srv/jacobian.hpp>
 
 
 #include <map>
@@ -54,7 +54,7 @@ namespace lab_tricolor {
             timer = create_wall_timer(1000ms,    // rate
                                               [&](){/*Publish function*/;});
             //initializing the service that compute the Jacobian (inverse, in this program)
-            jacobian_service_.init("jacobian_"+side,"/robot/limb/"+side+"/jacobian", 100ms); //timeout after 100ms
+            //jacobian_service_.init("jacobian_"+side,"/robot/limb/"+side+"/jacobian", 100ms); //timeout after 100ms
         }
     protected:
         /*
@@ -129,7 +129,7 @@ namespace lab_tricolor {
 
 
 
-        ServiceNodeSync<baxter_simple_sim::srv::Jacobian> jacobian_service_;
+        //ServiceNodeSync<baxter_simple_sim::srv::Jacobian> jacobian_service_;
 
 
     };
