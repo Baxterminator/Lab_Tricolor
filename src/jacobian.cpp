@@ -19,37 +19,13 @@
 #include <kdl/chainjnttojacsolver.hpp>
 #include <urdf/model.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <kdl/frames.hpp>
-
-
+#include <robot_state_publisher/robot_state_publisher.hpp>
+#include <Eigen/QR>
 
 
 using lab_tricolor::srv::Jacobian;
 using JacReq = Jacobian::Request::SharedPtr;
 using JacRes = Jacobian::Response::SharedPtr;
-
-//class Chain_fwd_solver_Baxter : public KDL::ChainFkSolverPos_recursive
-//{
-//public:
-//    int JntToCart(const KDL::JntArray& q_in, KDL::Frame& p_out, int segmentNr=-1){
-//        KDL::Rotation R = KDL::Rotation();
-//        KDL::Vector V = KDL::Vector();
-//        p_out = KDL::Frame(R, V);
-//    }
-//    int JntToCart(const KDL::JntArray& q_in, std::vector<KDL::Frame>& p_out, int segmentNr=-1){
-//        KDL::Rotation R = KDL::Rotation();
-//        KDL::Vector V = KDL::Vector();
-//        p_out = std::vector<KDL::Frame>({KDL::Frame(R, V)});
-//    }
-//};
-
-//int KDL::ChainFkSolverPos_recursive::JntToCart(const KDL::JntArray& q_in, KDL::Frame& p_out, int segmentNr){
-//    return 0;
-//}
-
-//int KDL::ChainFkSolverPos_recursive::JntToCart(const KDL::JntArray& q_in, std::vector<KDL::Frame>& p_out, int segmentNr){
-//    return 0;
-//}
 
 struct Solvers
 {
@@ -89,7 +65,7 @@ std::unique_ptr<urdf::Model> initRSP()
   // override rsp's options
   auto rsp_arg{rclcpp::NodeOptions()
         .arguments({"--ros-args", "-r", "__ns:=/robot", "-p", "robot_description:=" + xml})};
-  //rsp = std::make_shared<robot_state_publisher::RobotStatePublisher>(rsp_arg);
+  //rsp = std::make_shared<robot_state_publisher::RobotStatePublisher>(rsp_arg);        robot state publisher : needed for sim, not for work on real robot ?
 
   auto model{std::make_unique<urdf::Model>()};
   model->initString(xml);
@@ -123,41 +99,37 @@ namespace lab_tricolor {
         std::unique_ptr<Solvers> solvers;
 
 
-        void Jacobian_calc(const JacReq req, JacRes res)
+        void Jacobian_calc(const JacReq req, JacRes res)  //taken from baxter_simple_sim
         {
-                KDL::JntArray q(7);
-                std::copy(req->position.begin(), req->position.end(), q.data.data());
+            KDL::JntArray q(7);
+            std::copy(req->position.begin(), req->position.end(), q.data.data());
 
-                // get base Jacobian fJe
-                KDL::Jacobian J(7);
-                solvers->jac.JntToJac(q, J);
+            // get base Jacobian fJe
+            KDL::Jacobian J(7);
+            solvers->jac.JntToJac(q, J);
 
-                if(req->ee_frame)
+            if(req->ee_frame)
+            {
+            // we want eJe, rotate
+            KDL::Frame fMe;
+            solvers->fwd.JntToCart(q, fMe);
+            J.changeBase(fMe.M.Inverse());
+            }
+
+            const auto writeMatrix = [res](const Eigen::Matrix<double,Eigen::Dynamic, Eigen::Dynamic> &M)
+            {
+                auto elem{res->jacobian.begin()};
+                for(int row = 0; row < M.rows(); ++row)
                 {
-                // we want eJe, rotate
-                KDL::Frame fMe;
-                solvers->fwd.JntToCart(q, fMe);
-                J.changeBase(fMe.M.Inverse());
+                    for(int col = 0; col < M.cols(); ++col)
+                        *elem++ = M(row,col);
                 }
+            };
+            if(req->inverse)
+                writeMatrix(J.data.completeOrthogonalDecomposition().pseudoInverse());
+            else
+                writeMatrix(J.data);
 
-                const auto writeMatrix = [res](const Eigen::Matrix<double,Eigen::Dynamic, Eigen::Dynamic> &M)
-                {
-                    auto elem{res->jacobian.begin()};
-                    for(int row = 0; row < M.rows(); ++row)
-                    {
-                        for(int col = 0; col < M.cols(); ++col)
-                            *elem++ = M(row,col);
-                    }
-                };
-                if(req->inverse)
-                    int ije_sers_a_rien =0;//writeMatrix(J.data.completeOrthogonalDecomposition().pseudoInverse());
-                else
-                    writeMatrix(J.data);
-
-        //  response->sum = request->a + request->b;
-        //  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Incoming request\na: %ld" " b: %ld",
-        //                request->a, request->b);
-        //  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response: [%ld]", (long int)response->sum);
         }
 
     };
@@ -171,7 +143,6 @@ int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
     //rclcpp::spin(std::make_shared<lab_tricolor::Jacobian_node>(rclcpp::NodeOptions{}));
     std::shared_ptr<rclcpp::Node> node = std::make_shared<lab_tricolor::Jacobian_node>(rclcpp::NodeOptions{});
-    //rclcpp::Service<Jacobian>::SharedPtr service = node->
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;

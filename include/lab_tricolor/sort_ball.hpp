@@ -13,13 +13,14 @@
 #include "step_node.hpp"
 
 #include "std_msgs/msg/float32_multi_array.hpp" //for circle
+#include "sensor_msgs/msg/joint_state.h" //for state
 #include "baxter_core_msgs/msg/joint_command.hpp"
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/buffer.h"
 #include "baxter_core_msgs/srv/solve_position_ik.hpp"
 
 #include <geometry_msgs/msg/twist.hpp>
-//#include <lab_tricolor/srv/jacobian.hpp>
+#include <lab_tricolor/srv/jacobian.hpp>
 
 
 #include <map>
@@ -50,10 +51,18 @@ namespace lab_tricolor {
                 {
                     circle = *msg;
             });
+            sub_joint_state = create_subscription<sensor_msgs::msg::JointState>(
+                topic_state,    // which topic
+                1,         // QoS : real time
+                [this](sensor_msgs::msg::JointState::UniquePtr msg)    // callback are perfect for lambdas
+                {
+                    state = *msg;
+            });
             pub_command = create_publisher<baxter_core_msgs::msg::JointCommand>("robot/limb/"+side+"/joint_command", 1);   // topic + QoS
             timer = create_wall_timer(1000ms,    // rate
                                               [&](){/*Publish function*/;});
             //initializing the service that compute the Jacobian (inverse, in this program)
+            create_client<lab_tricolor::srv::Jacobian>("/robot/limb/"+side+"/jacobian ");
             //jacobian_service_.init("jacobian_"+side,"/robot/limb/"+side+"/jacobian", 100ms); //timeout after 100ms
         }
     protected:
@@ -123,9 +132,14 @@ namespace lab_tricolor {
         //tf2_ros::TransformListener tf_listener;
 
         Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr sub_circle;
+        Subscription<sensor_msgs::msg::JointState>::SharedPtr sub_joint_state;
+
         std_msgs::msg::Float32MultiArray circle;
+        sensor_msgs::msg::JointState state;
         rclcpp::TimerBase::SharedPtr timer;
         std::string topic_circle;
+        std::string topic_state = "/robot/joint_states";
+
 
 
 
