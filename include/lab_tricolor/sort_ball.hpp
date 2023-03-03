@@ -7,7 +7,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "lab_tricolor/step_node.hpp"
-#include "lab_tricolor/eigen.h"
+//#include "lab_tricolor/eigen.h"
 #include "lab_tricolor/ik_client.h"
 
 #include "step_node.hpp"
@@ -21,6 +21,8 @@
 
 #include <geometry_msgs/msg/twist.hpp>
 #include <lab_tricolor/srv/jacobian.hpp>
+#include <eigen3/Eigen/Core>
+#include <Eigen/QR>    
 
 
 #include <map>
@@ -60,11 +62,49 @@ namespace lab_tricolor {
             });
             pub_command = create_publisher<baxter_core_msgs::msg::JointCommand>("robot/limb/"+side+"/joint_command", 1);   // topic + QoS
             timer = create_wall_timer(1000ms,    // rate
-                                              [&](){/*Publish function*/;});
+                                              [&](){if(command_ini){pub_command->publish(command);}});
             //initializing the service that compute the Jacobian (inverse, in this program)
-            create_client<lab_tricolor::srv::Jacobian>("/robot/limb/"+side+"/jacobian ");
+            jac_node.init("jac_node","/robot/limb/" + side + "/jacobian");
+            //create_client<lab_tricolor::srv::Jacobian>("/robot/limb/"+side+"/jacobian ");
             //jacobian_service_.init("jacobian_"+side,"/robot/limb/"+side+"/jacobian", 100ms); //timeout after 100ms
+ 
+            // INITIALIZE COMMAND NAME / MODE : 
+            command.set__mode(command.POSITION_MODE);
+            std::vector<std::string> names(7);
+            for(int i=0;i<7;i++)
+                names[i] = side + suffixes[i];
+            command.set__names(names);
         }
+
+
+        inline Eigen::MatrixXd compute_Ls_inv(const double& x,const double& y,const double& z){
+            std::vector<double> Ls_vector={-1/z,0,x/z,x*y,-(1+std::pow(x,2)),y,0,-1/z,y/z,1+std::pow(y,2),-x*y,-x};
+            Eigen::Matrix<double,2,6, Eigen::RowMajor> Ls(Ls_vector) ;
+            std::cout << "Matrix Ls :" << Ls <<std::endl;
+            Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> cqr(Ls);
+            //Ls.data() = {-1/z,0,x/z,x*y,-(1+std::pow(x,2)),y,0,-1/z,y/z,1+std::pow(y,2),-x*y,-x};
+            //std::copy(Ls_vector.begin(), Ls_vector.end(), Ls.data());
+            auto Ls_inverse = cqr.pseudoInverse();
+            return Ls_inverse;
+        }
+        inline std::vector<double> computeCommand(const std::array<double, 42> &Jinv_coeffs,
+                                          const Eigen::Matrix<double,6,1> &vec_twist)
+        {
+            Eigen::Matrix<double,7,6, Eigen::RowMajor> Jinv;
+            std::copy(Jinv_coeffs.begin(), Jinv_coeffs.end(), Jinv.data());
+            const Eigen::Matrix<double,7,1> cmd{Jinv*vec_twist};
+            return {cmd.data(), cmd.data()+7};
+        }
+        // void write_Twist_msg(const Eigen::Matrix<double,6,1> &eigen_twist,geometry_msgs::msg::Twist &twist){ 
+        //     twist.linear.set__x(eigen_twist(0,0));
+        //     twist.linear.set__y(eigen_twist(1,0));
+        //     twist.linear.set__z(eigen_twist(2,0));
+        //     twist.angular.set__x(eigen_twist(3,0));
+        //     twist.angular.set__y(eigen_twist(4,0));
+        //     twist.angular.set__z(eigen_twist(5,0));
+        // }
+
+
     protected:
         /*
          * ################################################################
@@ -127,9 +167,8 @@ namespace lab_tricolor {
         std::string side = "left";
 
         Publisher<baxter_core_msgs::msg::JointCommand>::SharedPtr pub_command;
-
-        //tf2_ros::Buffer tf_buffer;
-        //tf2_ros::TransformListener tf_listener;
+        baxter_core_msgs::msg::JointCommand command;
+        bool command_ini=false;
 
         Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr sub_circle;
         Subscription<sensor_msgs::msg::JointState>::SharedPtr sub_joint_state;
@@ -140,7 +179,7 @@ namespace lab_tricolor {
         std::string topic_circle;
         std::string topic_state = "/robot/joint_states";
 
-
+        ServiceNodeSync<lab_tricolor::srv::Jacobian> jac_node;
 
 
         //ServiceNodeSync<baxter_simple_sim::srv::Jacobian> jacobian_service_;

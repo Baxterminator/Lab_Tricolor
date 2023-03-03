@@ -50,32 +50,27 @@ namespace lab_tricolor {
      * Describe the centering action
      */
     void LabNode::actionCentering() {
-        static int x_center = 320 ; //x_offset: 320 -> 640/2
-        static int y_center = 200;  //y_offset: 200 -> 400/2
-        static float Zref = 0;
-        static float Rref = 0;
-        static float pi = 3.1415926;
-        std::vector<float> e = {circle.data[0]-x_center,circle.data[1]-y_center}; //à verif : peut etre 0,0 au lieu de centre en pixel
+        Eigen::Matrix<double,2,1> e = {circle.data[0]-x_center,circle.data[1]-y_center}; //à verif : peut etre 0,0 au lieu de centre en pixel
         float lambda = 1;
         float R_circle = pow((circle.data[2]/pi),0.5);
-        float Zmesured = Zref + Rref/R_circle;
-        std::vector<std::vector<float>> Ls_inv(6);
-        Ls_inv.resize(6);
-        for (int i=0;i<Ls_inv.size();i++){
-           Ls_inv[i].resize(2);
-        }
-        geometry_msgs::msg::Twist Twist;
-
-        auto request = std::make_shared<lab_tricolor::srv::Jacobian::Request>();
-        request->inverse = true;
-        request->ee_frame = true;
+        float Zmesured = Zref * Rref/R_circle;
+        auto Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
+        Eigen::MatrixXd twist_mat;
+        Eigen::Matrix<double,6,1> twist_mat = -lambda*Ls_inv*e;
+        //geometry_msgs::msg::Twist Twist;
+        //Twist.angular.
+        auto req = std::make_shared<lab_tricolor::srv::Jacobian::Request>();
+        req->inverse = true;
+        req->ee_frame = true;
         if(side=="left"){
-            float64[7] sub(state.position.begin()+2,state.position.begin()+9);
-            request->position = sub;
+            std::copy(state.position.begin()+2,state.position.begin()+9,req->position);
         }
         else{
-            std::vector<float> sub(state.position.begin()+9,state.position.begin()+16);
-            request->position = sub;
+            std::copy(state.position.begin()+9,state.position.begin()+16,req->position);
+        }
+        if(lab_tricolor::srv::Jacobian::Response res; jac_node.call(req, res)){
+            command.set__command(computeCommand(res.jacobian,twist_mat));
+            command_ini = true;
         }
         
     }

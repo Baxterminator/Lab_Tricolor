@@ -55,6 +55,12 @@ namespace lab_tricolor {
         inline void increment_step() { step = check_step(step); }
         std::map<E, cfunc> check_map = std::map<E, cfunc>();
         std::map<E, afunc> action_map = std::map<E, afunc>();
+
+        const int x_center = 320 ; //x_offset: 320 -> 640/2
+        const int y_center = 200;  //y_offset: 200 -> 400/2
+        const float Zref = 0;       // TO DEF
+        const float Rref = 0;       // TO DEF
+        const float pi = 3.1415926;
     };
 }
 
