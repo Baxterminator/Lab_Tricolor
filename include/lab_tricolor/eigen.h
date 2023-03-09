@@ -1,14 +1,14 @@
 #ifndef EXAM_2022_EIGEN_H
 #define EXAM_2022_EIGEN_H
 
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 #include <lab_tricolor/ik_client.h>
 #include <geometry_msgs/msg/twist.hpp>
 
 // math to meaningfull stuff
-using JacobianInverseCoefs = std::array<double, 42>;
+//using JacobianInverseCoefs = std::array<double, 42>;
 
-inline std::vector<double> computeCommand(const JacobianInverseCoefs &Jinv_coeffs,
+inline std::vector<double> computeCommand(const std::array<double, 42> &Jinv_coeffs,
                                           const geometry_msgs::msg::Twist &v)
 {
   Eigen::Matrix<double,7,6, Eigen::RowMajor> Jinv;

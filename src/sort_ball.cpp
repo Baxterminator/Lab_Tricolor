@@ -1,5 +1,6 @@
 //
 // Created by gcote2021 on 26/01/23.
+// Modified by B on 09/03/23.
 //
 
 #include "lab_tricolor/sort_ball.hpp"
@@ -7,24 +8,24 @@
 namespace lab_tricolor {
 
     class LabNode : public SortBall {
-    public:
-        LabNode(NodeOptions opts) : SortBall(opts) {
+        public:
+            LabNode(NodeOptions opts) : SortBall(opts) {
 
-        }
-    protected:
-        bool checkTSource();
-        bool checkCentering();
-        bool checkApproach();
-        bool checkGrip();
-        bool checkTDest();
-        bool checkRelease();
+            }
+        protected:
+            bool checkTSource();
+            bool checkCentering();
+            bool checkApproach();
+            bool checkGrip();
+            bool checkTDest();
+            bool checkRelease();
 
-        void actionTSource();
-        void actionCentering();
-        void actionApproach();
-        void actionGrip();
-        void actionTDest();
-        void actionRelease();
+            void actionTSource();
+            void actionCentering();
+            void actionApproach();
+            void actionGrip();
+            void actionTDest();
+            void actionRelease();
     };
 
     /**
@@ -50,12 +51,14 @@ namespace lab_tricolor {
      * Describe the centering action
      */
     void LabNode::actionCentering() {
-        Eigen::Matrix<double,2,1> e = {circle.data[0]-x_center,circle.data[1]-y_center}; //à verif : peut etre 0,0 au lieu de centre en pixel
+        Eigen::Matrix<double,2,1> e = {
+            circle.data[0]-x_center,circle.data[1]-y_center
+        }; //à verif : peut etre 0,0 au lieu de centre en pixel
         float lambda = 1;
         float R_circle = pow((circle.data[2]/pi),0.5);
         float Zmesured = Zref * Rref/R_circle;
         auto Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
-        Eigen::MatrixXd twist_mat;
+        //Eigen::MatrixXd twist_mat;
         Eigen::Matrix<double,6,1> twist_mat = -lambda*Ls_inv*e;
         //geometry_msgs::msg::Twist Twist;
         //Twist.angular.

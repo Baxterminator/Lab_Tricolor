@@ -35,9 +35,10 @@ macro(add_message node_name)
         target_link_libraries(${node_name} "${cpp_typesupport_target}")
     endif()
 endmacro()
-
+ 
 ament_auto_add_executable(sort_ball src/sort_ball.cpp)
 target_include_directories(sort_ball PRIVATE include)
+add_message(sort_ball)
 
 ament_auto_add_executable(jacobian src/jacobian.cpp)
 target_include_directories(jacobian PRIVATE include)
