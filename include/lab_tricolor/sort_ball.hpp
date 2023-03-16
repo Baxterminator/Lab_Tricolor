@@ -19,16 +19,12 @@
 #include "baxter_core_msgs/msg/joint_command.hpp"
 #include "baxter_core_msgs/srv/solve_position_ik.hpp"
 
-
-
 #include <Eigen/Core>
 #include <Eigen/QR>    
-
 
 #include "lab_tricolor/step_node.hpp"
 //#include "lab_tricolor/eigen.h"
 #include "lab_tricolor/ik_client.h"
-
 #include "step_node.hpp"
 
 #include "tf2_ros/transform_listener.h"
@@ -56,6 +52,11 @@ namespace lab_tricolor {
     class SortBall : public StepNode<Step> {
     public:
         explicit SortBall(NodeOptions opts) : StepNode<Step>("sort_ball", opts) {
+            this->declare_parameter("side", "left");
+            side = this->get_parameter("side").get_parameter_value().get<std::string>();
+            
+
+
             sub_circle = create_subscription<std_msgs::msg::Float32MultiArray>(
                 topic_circle,    // which topic
                 1,         // QoS : real time
@@ -85,7 +86,6 @@ namespace lab_tricolor {
                 names[i] = side + suffixes[i];
             command.set__names(names);
         }
-
 
         inline Eigen::MatrixXd compute_Ls_inv(const double& x,const double& y,const double& z){
             std::vector<double> Ls_vectorl1={
@@ -184,11 +184,10 @@ namespace lab_tricolor {
         std_msgs::msg::Float32MultiArray circle;
         sensor_msgs::msg::JointState state;
         rclcpp::TimerBase::SharedPtr timer;
-        std::string topic_circle;
+        std::string topic_circle = "robot/"+side+"_circle";
         std::string topic_state = "/robot/joint_states";
 
         ServiceNodeSync<lab_tricolor::srv::Jacobian> jac_node;
-
 
         //ServiceNodeSync<baxter_simple_sim::srv::Jacobian> jacobian_service_;
 
