@@ -5,27 +5,37 @@
 #ifndef BUILD_SORT_BALL_H
 #define BUILD_SORT_BALL_H
 
+#include <iterator>
+#include <vector>
+
+
 #include "rclcpp/rclcpp.hpp"
+
+
+#include <geometry_msgs/msg/twist.hpp>
+#include "std_msgs/msg/float32_multi_array.hpp" //for circle
+#include "sensor_msgs/msg/joint_state.h" //for state
+#include <lab_tricolor/srv/jacobian.hpp>
+#include "baxter_core_msgs/msg/joint_command.hpp"
+#include "baxter_core_msgs/srv/solve_position_ik.hpp"
+
+
+
+#include <Eigen/Core>
+#include <Eigen/QR>    
+
+
 #include "lab_tricolor/step_node.hpp"
 //#include "lab_tricolor/eigen.h"
 #include "lab_tricolor/ik_client.h"
 
 #include "step_node.hpp"
 
-#include "std_msgs/msg/float32_multi_array.hpp" //for circle
-#include "sensor_msgs/msg/joint_state.h" //for state
-#include "baxter_core_msgs/msg/joint_command.hpp"
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/buffer.h"
-#include "baxter_core_msgs/srv/solve_position_ik.hpp"
-
-#include <geometry_msgs/msg/twist.hpp>
-#include <lab_tricolor/srv/jacobian.hpp>
-#include <eigen3/Eigen/Core>
-#include <Eigen/QR>    
-
 
 #include <map>
+
 namespace lab_tricolor {
 
     using namespace rclcpp;
@@ -78,13 +88,20 @@ namespace lab_tricolor {
 
 
         inline Eigen::MatrixXd compute_Ls_inv(const double& x,const double& y,const double& z){
-            std::vector<double> Ls_vector={-1/z,0,x/z,x*y,-(1+std::pow(x,2)),y,0,-1/z,y/z,1+std::pow(y,2),-x*y,-x};
-            Eigen::Matrix<double,2,6, Eigen::RowMajor> Ls(Ls_vector) ;
+            std::vector<double> Ls_vectorl1={
+                -1/z,0,x/z,x*y,-(1+std::pow(x,2)),y
+            };
+            std::vector<double> Ls_vectorl2={
+                0,-1/z,y/z,1+std::pow(y,2),-x*y,-x
+            };
+            Eigen::Matrix<double,2,6, Eigen::RowMajor> Ls ;
+            Ls << -1/z,0,x/z,x*y,-(1+std::pow(x,2)),y;
+            Ls << 0,-1/z,y/z,1+std::pow(y,2),-x*y,-x;
             std::cout << "Matrix Ls :" << Ls <<std::endl;
             Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> cqr(Ls);
             //Ls.data() = {-1/z,0,x/z,x*y,-(1+std::pow(x,2)),y,0,-1/z,y/z,1+std::pow(y,2),-x*y,-x};
             //std::copy(Ls_vector.begin(), Ls_vector.end(), Ls.data());
-            auto Ls_inverse = cqr.pseudoInverse();
+            Eigen::MatrixXd Ls_inverse = cqr.pseudoInverse();
             return Ls_inverse;
         }
         inline std::vector<double> computeCommand(const std::array<double, 42> &Jinv_coeffs,
@@ -92,18 +109,9 @@ namespace lab_tricolor {
         {
             Eigen::Matrix<double,7,6, Eigen::RowMajor> Jinv;
             std::copy(Jinv_coeffs.begin(), Jinv_coeffs.end(), Jinv.data());
-            const Eigen::Matrix<double,7,1> cmd{Jinv*vec_twist};
+            const Eigen::Matrix<double,7,1> cmd{(Jinv*vec_twist)};
             return {cmd.data(), cmd.data()+7};
         }
-        // void write_Twist_msg(const Eigen::Matrix<double,6,1> &eigen_twist,geometry_msgs::msg::Twist &twist){ 
-        //     twist.linear.set__x(eigen_twist(0,0));
-        //     twist.linear.set__y(eigen_twist(1,0));
-        //     twist.linear.set__z(eigen_twist(2,0));
-        //     twist.angular.set__x(eigen_twist(3,0));
-        //     twist.angular.set__y(eigen_twist(4,0));
-        //     twist.angular.set__z(eigen_twist(5,0));
-        // }
-
 
     protected:
         /*
