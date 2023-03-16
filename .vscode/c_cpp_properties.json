@@ -18,7 +18,8 @@
                 "/home/ecn/ros2/src/ball_detector/include/**",
                 "/home/ecn/ros2/src/cpp_pubsub/include/**",
                 "/home/ecn/ros2/src/create_display_marker/include/**",
-                "/usr/include/**"
+                "/usr/include/**",
+                "/usr/lib/**"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

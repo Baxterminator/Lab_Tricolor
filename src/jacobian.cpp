@@ -6,9 +6,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "lab_tricolor/sort_ball.hpp"
-//#include "lab_tricolor/KDL_jacobian.hpp"
-#include <lab_tricolor/srv/jacobian.hpp>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/frames.hpp>
 #include <kdl/frames_io.hpp>
@@ -19,9 +18,13 @@
 #include <kdl/chainiksolvervel_pinv.hpp>
 #include <kdl/chainjnttojacsolver.hpp>
 #include <urdf/model.h>
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <robot_state_publisher/robot_state_publisher.hpp>
 #include <Eigen/QR>
+
+#include "lab_tricolor/sort_ball.hpp"
+//#include "lab_tricolor/KDL_jacobian.hpp"
+#include <lab_tricolor/srv/jacobian.hpp>
+
 
 
 using lab_tricolor::srv::Jacobian;
@@ -97,7 +100,6 @@ namespace lab_tricolor {
             {
                 KDL::JntArray q(7);
                 std::copy(req->position.begin(), req->position.end(), q.data.data());
-
                 // get base Jacobian fJe
                 KDL::Jacobian J(7);
                 solvers->jac.JntToJac(q, J);

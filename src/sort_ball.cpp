@@ -57,7 +57,7 @@ namespace lab_tricolor {
         float lambda = 1;
         float R_circle = pow((circle.data[2]/pi),0.5);
         float Zmesured = Zref * Rref/R_circle;
-        auto Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
+        Eigen::MatrixXd Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
         //Eigen::MatrixXd twist_mat;
         Eigen::Matrix<double,6,1> twist_mat = -lambda*Ls_inv*e;
         //geometry_msgs::msg::Twist Twist;
@@ -65,11 +65,15 @@ namespace lab_tricolor {
         auto req = std::make_shared<lab_tricolor::srv::Jacobian::Request>();
         req->inverse = true;
         req->ee_frame = true;
-        if(side=="left"){
-            std::copy(state.position.begin()+2,state.position.begin()+9,req->position);
+        int start_array = 2;
+        if(side=="right"){
+            start_array = 9;
+            //std::copy(state.position.begin()+9,state.position.begin()+16,req->position);
         }
-        else{
-            std::copy(state.position.begin()+9,state.position.begin()+16,req->position);
+        else{//std::copy(state.position.begin()+2,state.position.begin()+9,req->position);
+        }
+        for (int i=0;i<7;i++){
+            req->position[i]= state.position[i+start_array];
         }
         if(lab_tricolor::srv::Jacobian::Response res; jac_node.call(req, res)){
             command.set__command(computeCommand(res.jacobian,twist_mat));
