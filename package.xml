@@ -19,13 +19,15 @@
 
   <depend>frames</depend>
   <depend>urdf</depend>
-  
+  <depend>tf2_ros</depend>
+  <depend>robot_state_publisher</depend>
 
   <depend>Eigen3</depend>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
+
 
   <member_of_group>rosidl_interface_packages</member_of_group>
 
