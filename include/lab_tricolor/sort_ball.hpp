@@ -39,7 +39,7 @@ namespace lab_tricolor {
     using namespace rclcpp;
 
 
-    enum class Step {
+    enum Step {
         IDLE,
         T_SOURCE,
         CENTERING,
@@ -54,9 +54,33 @@ namespace lab_tricolor {
     class SortBall : public StepNode<Step> {
     public:
         explicit SortBall(NodeOptions opts) : StepNode<Step>("sort_ball", opts) {
+
+            check_map = {
+                {Step::IDLE, [this] () { return checkIdle();}},
+                {Step::T_SOURCE, [this] () { return checkTSource(); }},
+                {Step::CENTERING, [this] () { return checkCentering(); }},
+                {Step::APPROACH, [this] () { return checkApproach(); }},
+                {Step::GRIP, [this] () { return checkGrip(); }},
+                {Step::T_DEST, [this] () { return checkTDest(); }},
+                {Step::RELEASE, [this] () { return checkRelease(); }},
+        };
+
+            action_map = {
+                {Step::T_SOURCE, [this] () { return actionTSource();}},
+                {Step::CENTERING, [this] () { return actionCentering();}},
+                {Step::APPROACH, [this] () { return actionApproach();}},
+                {Step::GRIP, [this] () { return actionGrip();}},
+                {Step::T_DEST, [this] () { return actionTDest();}},
+                {Step::RELEASE, [this] () { return actionRelease();}},
+        };
+
+            RCLCPP_INFO_ONCE(this->get_logger(), "Initializing");
             this->declare_parameter("side", "left");
             side = this->get_parameter("side").get_parameter_value().get<std::string>();
             
+            topic_circle = "/robot/"+side+"_circle";
+            increment_step();
+            increment_step();
 
 
             sub_circle = create_subscription<std_msgs::msg::Float32MultiArray>(
@@ -86,6 +110,7 @@ namespace lab_tricolor {
             for(int i=0;i<7;i++)
                 names[i] = side + suffixes[i];
             command.set__names(names);
+            RCLCPP_INFO_ONCE(this->get_logger(), "End of ini");
 
         }
 
@@ -124,6 +149,10 @@ namespace lab_tricolor {
         Step check_step(Step act_step) override {
             if (act_step == Step::RELEASE)
                 return Step::IDLE;
+            if (act_step == Step::IDLE)
+                return Step::T_SOURCE;
+            if (act_step == Step::T_SOURCE)
+                return Step::CENTERING;
             return act_step;
         }
 
@@ -132,24 +161,7 @@ namespace lab_tricolor {
          *                          Step Matching
          * ################################################################
          */
-        // Map of function to use for checking and acting at each step
-        const std::map<Step, cfunc> check_map = {
-                {Step::IDLE, [this] () { return checkIdle();}},
-                {Step::T_SOURCE, [this] () { return checkTSource(); }},
-                {Step::CENTERING, [this] () { return checkCentering(); }},
-                {Step::APPROACH, [this] () { return checkApproach(); }},
-                {Step::GRIP, [this] () { return checkGrip(); }},
-                {Step::T_DEST, [this] () { return checkTDest(); }},
-                {Step::RELEASE, [this] () { return checkRelease(); }},
-        };
-        const std::map<Step, afunc> action_map = {
-                {Step::T_SOURCE, [this] () { return actionTSource();}},
-                {Step::CENTERING, [this] () { return actionCentering();}},
-                {Step::APPROACH, [this] () { return actionApproach();}},
-                {Step::GRIP, [this] () { return actionGrip();}},
-                {Step::T_DEST, [this] () { return actionTDest();}},
-                {Step::RELEASE, [this] () { return actionRelease();}},
-        };
+        // Map of function to use for checking and acting at each 
 
         /*
          * ################################################################
@@ -186,8 +198,8 @@ namespace lab_tricolor {
         std_msgs::msg::Float32MultiArray circle;
         sensor_msgs::msg::JointState state;
         rclcpp::TimerBase::SharedPtr timer;
-        std::string topic_circle = "robot/"+side+"_circle";
-        std::string topic_state = "/robot/joint_states";
+        std::string topic_circle = "/robot/"+side+"_circle";
+        const std::string topic_state = "/robot/joint_states";
 
         ServiceNodeSync<lab_tricolor::srv::Jacobian> jac_node;
         ServiceNodeSync<baxter_core_msgs::srv::SolvePositionIK> ik_node;

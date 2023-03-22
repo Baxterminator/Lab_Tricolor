@@ -52,6 +52,7 @@ namespace lab_tricolor {
      * Describe the centering action
      */
     void LabNode::actionCentering() {
+        RCLCPP_INFO_ONCE(this->get_logger(), "Centering");
         Eigen::Matrix<double,2,1> e = {
             circle.data[0]-x_center,circle.data[1]-y_center
         }; //à verif : peut etre 0,0 au lieu de centre en pixel
@@ -75,6 +76,7 @@ namespace lab_tricolor {
             req->position[i]= state.position[i+start_array];
         }
         if(lab_tricolor::srv::Jacobian::Response res; jac_node.call(req, res)){
+            RCLCPP_INFO_ONCE(this->get_logger(), "Got response from jac_node");
             command.set__command(computeCommand(res.jacobian,twist_mat));
             command_ini = true;
         }

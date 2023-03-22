@@ -98,6 +98,7 @@ namespace lab_tricolor {
 
             void Jacobian_calc(const JacReq req, JacRes res)  //taken from baxter_simple_sim
             {
+                RCLCPP_INFO_ONCE(this->get_logger(), "Calculating Jacobian");
                 KDL::JntArray q(7);
                 std::copy(req->position.begin(), req->position.end(), q.data.data());
                 // get base Jacobian fJe

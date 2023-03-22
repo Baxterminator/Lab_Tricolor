@@ -7,6 +7,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
+#include <iostream>
 
 namespace lab_tricolor {
 
@@ -33,6 +34,7 @@ namespace lab_tricolor {
 
         E check(E actual_step) {
             if (const auto it = check_map.find(actual_step); it != check_map.end()) {
+                std::cout<<"checked"<<std::endl;
                 auto f = check_map.at(actual_step);
                 if (f())
                     increment_step();
@@ -40,14 +42,23 @@ namespace lab_tricolor {
             return actual_step;
         }
         void action(E actual_step) {
-            if (const auto it = check_map.find(actual_step); it != check_map.end()) {
-                auto f = check_map.at(actual_step);
+            if (action_map.count(actual_step)){
+            //typename std::map<E, afunc>::const_iterator pos = action_map.find(actual_step);
+                std::cout << "in action" << std::endl;
+
+                auto f = action_map.at(actual_step);
                 f();
             }
+            // if(pos!=action_map.end()){
+            //     auto f = action_map.at(actual_step);
+            //     f();
+            //     }
         }
 
         void iterate_step() {
+            std::cout << "Actual step : " << step << std::endl;
             step = check(step);
+            std::cout << " Step after check: " << step << std::endl;
             action(step);
         }
     protected:
@@ -55,12 +66,13 @@ namespace lab_tricolor {
         inline void increment_step() { step = check_step(step); }
         std::map<E, cfunc> check_map = std::map<E, cfunc>();
         std::map<E, afunc> action_map = std::map<E, afunc>();
-
-        const int x_center = 320 ; //x_offset: 320 -> 640/2
-        const int y_center = 200;  //y_offset: 200 -> 400/2
-        const float Zref = 0;       // TO DEF
-        const float Rref = 0;       // TO DEF
+        
         const float pi = 3.1415926;
+        const int x_center = 320 ; //x_offset: 320 -> 640/2
+        const int y_center = 200 ;  //y_offset: 200 -> 400/2
+        const double Zref = 0.14 ;       // TO DEF
+        const double Rref = pow(0.052545081824064255/pi,0.5) ;       // TO DEF
+        
     };
 }
 
