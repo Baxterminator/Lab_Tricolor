@@ -4,6 +4,7 @@
 //
 
 #include "lab_tricolor/sort_ball.hpp"
+#include <geometry_msgs/msg/detail/point__struct.hpp>
 
 namespace lab_tricolor {
 
@@ -57,25 +58,26 @@ namespace lab_tricolor {
         float lambda = 1;
         float R_circle = pow((circle.data[2]/pi),0.5);
         float Zmesured = Zref * Rref/R_circle;
-        auto Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
-        //Eigen::MatrixXd twist_mat;
+        Eigen::MatrixXd Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
         Eigen::Matrix<double,6,1> twist_mat = -lambda*Ls_inv*e;
-        //geometry_msgs::msg::Twist Twist;
         //Twist.angular.
         auto req = std::make_shared<lab_tricolor::srv::Jacobian::Request>();
         req->inverse = true;
         req->ee_frame = true;
-        if(side=="left"){
-            std::copy(state.position.begin()+2,state.position.begin()+9,req->position);
+        int start_array = 2;
+        if(side=="right"){
+            start_array = 9;
+            //std::copy(state.position.begin()+9,state.position.begin()+16,req->position);
         }
-        else{
-            std::copy(state.position.begin()+9,state.position.begin()+16,req->position);
+        else{//std::copy(state.position.begin()+2,state.position.begin()+9,req->position);
+        }
+        for (int i=0;i<7;i++){
+            req->position[i]= state.position[i+start_array];
         }
         if(lab_tricolor::srv::Jacobian::Response res; jac_node.call(req, res)){
             command.set__command(computeCommand(res.jacobian,twist_mat));
             command_ini = true;
         }
-        
     }
 
     /**
@@ -88,7 +90,7 @@ namespace lab_tricolor {
      * Describe the approach to the ball
      */
     void LabNode::actionApproach() {
-
+        
     }
 
     /**
@@ -114,7 +116,33 @@ namespace lab_tricolor {
      * Describe the movement to the destination box
      */
     void LabNode::actionTDest() {
-
+        geometry_msgs::msg::Point Point_to_get = vec_points[index_point];
+            // build service request SolvePositionIK::Request from obtained transform
+        baxter_core_msgs::srv::SolvePositionIK::Request req;
+        std::vector<geometry_msgs::msg::PoseStamped> Poses;
+        geometry_msgs::msg::PoseStamped PoseStamped;
+        PoseStamped.pose.orientation; //TO DO : Z vers le bas ?
+        PoseStamped.pose.position.x = Point_to_get.x;
+        PoseStamped.pose.position.y = Point_to_get.y;
+        PoseStamped.pose.position.z = Point_to_get.z;
+        Poses.push_back(PoseStamped);
+        req.set__seed_mode(req.SEED_AUTO);
+        req.set__pose_stamp(Poses);
+        if(baxter_core_msgs::srv::SolvePositionIK::Response res; ik_node.call(req, res))
+        {
+            // call to IK was successfull, check if the solution is valid
+            if (res.is_valid[0]  ){
+                command.names = res.joints[0].name;
+                int n = res.joints[0].position.size();
+                for (int k = 0; k<n;k++){
+                    command.command.resize(7);
+                    command.command[k] = res.joints[0].position[k];
+                    command.set__mode(command.RAW_POSITION_MODE);
+                }
+                RCLCPP_INFO(this->get_logger(), "Publishing");
+                pub_command->publish(command);
+            }
+        }
     }
 
     /**
