@@ -1,4 +1,9 @@
 /build
 CMakeLists.txt.user
 CMakeLists.txt.user.8a09d2d
-
+.cache
+.cache/clangd/index/ik_client.h.75DBBAABF836C8A3.idx
+.cache/clangd/index/jacobian.cpp.A5427289E047F30B.idx
+.cache/clangd/index/sort_ball.cpp.45CD44ED40FBA84E.idx
+.cache/clangd/index/sort_ball.hpp.3773D21BF310A0FF.idx
+.cache/clangd/index/step_node.hpp.3E554DC8C460557A.idx
