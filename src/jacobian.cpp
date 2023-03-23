@@ -76,13 +76,13 @@ std::unique_ptr<urdf::Model> initRSP()
 namespace lab_tricolor {
     class Jacobian_node : public rclcpp::Node{
         public:
-            Jacobian_node(rclcpp::NodeOptions options) : Node("node_name", options){
+            Jacobian_node(rclcpp::NodeOptions options) : Node("jac_name", options){
                 const auto model{initRSP()};
                 KDL::Tree tree;
                 kdl_parser::treeFromUrdfModel(*model, tree);
                 tree.getChain("base", side + "_gripper", arm_chain);
                 solvers = std::make_unique<Solvers>(arm_chain);
-                jacobian_service = this->create_service<Jacobian>("/robot/limb/" + side + "/jacobian", [&](JacReq req, JacRes res){Jacobian_calc(req,res);});
+                jacobian_service = this->create_service<Jacobian>("/robot/" + side + "/jacobian", [&](JacReq req, JacRes res){Jacobian_calc(req,res);});
             }
 
         private:
@@ -98,7 +98,7 @@ namespace lab_tricolor {
 
             void Jacobian_calc(const JacReq req, JacRes res)  //taken from baxter_simple_sim
             {
-                RCLCPP_INFO_ONCE(this->get_logger(), "Calculating Jacobian");
+                RCLCPP_INFO(this->get_logger(), "Calculating Jacobian");
                 KDL::JntArray q(7);
                 std::copy(req->position.begin(), req->position.end(), q.data.data());
                 // get base Jacobian fJe

@@ -101,7 +101,7 @@ namespace lab_tricolor {
             timer = create_wall_timer(1000ms,    // rate
                                               [&](){if(command_ini){pub_command->publish(command);}});
             //initializing the service that compute the Jacobian (inverse, in this program) and the inverse kinematic (ik)
-            jac_node.init("jac_node","/robot/limb/" + side + "/jacobian");
+            jac_node.init("jac_node","/robot/" + side + "/jacobian");
             ik_node.init("ik_node","/ExternalTools/left/PositionKinematicsNode/IKService");
  
             // INITIALIZE COMMAND NAME / MODE : 
@@ -123,8 +123,8 @@ namespace lab_tricolor {
                 0,-1/z,y/z,1+std::pow(y,2),-x*y,-x
             };
             Eigen::Matrix<double,2,6, Eigen::RowMajor> Ls ;
-            Ls << -1/z,0,x/z,x*y,-(1+std::pow(x,2)),y;
-            Ls << 0,-1/z,y/z,1+std::pow(y,2),-x*y,-x;
+            Ls << -1/z,0,x/z,x*y,-(1+std::pow(x,2)),y,
+            0,-1/z,y/z,1+std::pow(y,2),-x*y,-x;
             std::cout << "Matrix Ls :" << Ls <<std::endl;
             // COMPUTING THE INVERSE : 
             Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> cqr(Ls);

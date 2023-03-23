@@ -53,32 +53,40 @@ namespace lab_tricolor {
      */
     void LabNode::actionCentering() {
         RCLCPP_INFO_ONCE(this->get_logger(), "Centering");
-        Eigen::Matrix<double,2,1> e = {
-            circle.data[0]-x_center,circle.data[1]-y_center
-        }; //à verif : peut etre 0,0 au lieu de centre en pixel
-        float lambda = 1;
-        float R_circle = pow((circle.data[2]/pi),0.5);
-        float Zmesured = Zref * Rref/R_circle;
-        Eigen::MatrixXd Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
-        Eigen::Matrix<double,6,1> twist_mat = -lambda*Ls_inv*e;
-        //Twist.angular.
-        auto req = std::make_shared<lab_tricolor::srv::Jacobian::Request>();
-        req->inverse = true;
-        req->ee_frame = true;
-        int start_array = 2;
-        if(side=="right"){
-            start_array = 9;
-            //std::copy(state.position.begin()+9,state.position.begin()+16,req->position);
-        }
-        else{//std::copy(state.position.begin()+2,state.position.begin()+9,req->position);
-        }
-        for (int i=0;i<7;i++){
-            req->position[i]= state.position[i+start_array];
-        }
-        if(lab_tricolor::srv::Jacobian::Response res; jac_node.call(req, res)){
-            RCLCPP_INFO_ONCE(this->get_logger(), "Got response from jac_node");
-            command.set__command(computeCommand(res.jacobian,twist_mat));
-            command_ini = true;
+        if(circle.data.size()){
+            Eigen::Matrix<double,2,1> e = {
+                circle.data[0]-0,circle.data[1]-0
+            }; //à verif : peut etre 0,0 au lieu de centre en pixel
+            RCLCPP_INFO_ONCE(this->get_logger(), "Made e (error)");
+            float lambda = 1;
+            float R_circle = pow((circle.data[2]/pi),0.5);
+            float Zmesured = Zref * Rref/R_circle;
+            std::cout<<"x:" <<circle.data[0]<<" y:"<<circle.data[1]<<" area:"<<circle.data[2] <<std::endl;
+            RCLCPP_INFO_ONCE(this->get_logger(), "Building Ls");
+            Eigen::MatrixXd Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
+            Eigen::Matrix<double,6,1> twist_mat = -lambda*Ls_inv*e;
+            //Twist.angular.
+            std::cout <<"twist mat built" <<std::endl;
+            auto req = std::make_shared<lab_tricolor::srv::Jacobian::Request>();
+            req->inverse = true;
+            req->ee_frame = true;
+            int start_array = 2;
+            if(side=="right"){
+                start_array = 9;
+                //std::copy(state.position.begin()+9,state.position.begin()+16,req->position);
+            }
+            else{//std::copy(state.position.begin()+2,state.position.begin()+9,req->position);
+            }
+            RCLCPP_INFO(this->get_logger(), "start_array initialised");
+            for (int i=0;i<7;i++){
+                req->position[i]= state.position[i+start_array];
+            }
+            RCLCPP_INFO(this->get_logger(), "req built");
+            if(lab_tricolor::srv::Jacobian::Response res; jac_node.call(req, res)){
+                RCLCPP_INFO_ONCE(this->get_logger(), "Got response from jac_node");
+                command.set__command(computeCommand(res.jacobian,twist_mat));
+                command_ini = true;
+            }
         }
     }
 
