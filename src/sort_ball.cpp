@@ -1,6 +1,5 @@
 //
 // Created by gcote2021 on 26/01/23.
-// Modified by B on 09/03/23.
 //
 
 #include "lab_tricolor/sort_ball.hpp"
@@ -15,14 +14,12 @@ namespace lab_tricolor {
             }
         protected:
             bool checkTSource();
-            bool checkCentering();
             bool checkApproach();
             bool checkGrip();
             bool checkTDest();
             bool checkRelease();
 
             void actionTSource();
-            void actionCentering();
             void actionApproach();
             void actionGrip();
             void actionTDest();
@@ -45,22 +42,22 @@ namespace lab_tricolor {
     /**
      * Check whether the ball is centered on the camera image
      */
-    bool LabNode::checkCentering() {
+    bool LabNode::checkApproach() {
         return false;
     }
     /**
      * Describe the centering action
      */
-    void LabNode::actionCentering() {
-        RCLCPP_INFO_ONCE(this->get_logger(), "Centering");
+    void LabNode::actionApproach() {
+        RCLCPP_INFO_ONCE(this->get_logger(), "Approach");
         if(circle.data.size()){
             Eigen::Matrix<double,2,1> e = {
                 circle.data[0]-0,circle.data[1]-0
             }; //à verif : peut etre 0,0 au lieu de centre en pixel
             RCLCPP_INFO_ONCE(this->get_logger(), "Made e (error)");
-            float lambda = 1;
-            float R_circle = pow((circle.data[2]/pi),0.5);
-            float Zmesured = Zref * Rref/R_circle;
+            double lambda = 1;
+            double R_circle = pow((circle.data[2]/pi),0.5);
+            double Zmesured = Zref * Rref/R_circle;
             std::cout<<"x:" <<circle.data[0]<<" y:"<<circle.data[1]<<" area:"<<circle.data[2] <<std::endl;
             RCLCPP_INFO_ONCE(this->get_logger(), "Building Ls");
             Eigen::MatrixXd Ls_inv = compute_Ls_inv(circle.data[0],circle.data[1],Zmesured);
@@ -71,12 +68,8 @@ namespace lab_tricolor {
             req->inverse = true;
             req->ee_frame = true;
             int start_array = 2;
-            if(side=="right"){
-                start_array = 9;
-                //std::copy(state.position.begin()+9,state.position.begin()+16,req->position);
-            }
-            else{//std::copy(state.position.begin()+2,state.position.begin()+9,req->position);
-            }
+            if(side=="right"){start_array = 9;} // state position give hea and torso position on 0,1 then left arm chain then right arm chain
+
             RCLCPP_INFO(this->get_logger(), "start_array initialised");
             for (int i=0;i<7;i++){
                 req->position[i]= state.position[i+start_array];
@@ -89,20 +82,6 @@ namespace lab_tricolor {
             }
         }
     }
-
-    /**
-     * Check whether the robot is at the next point for the approaching phase
-     */
-    bool LabNode::checkApproach() {
-        return false;
-    }
-    /**
-     * Describe the approach to the ball
-     */
-    void LabNode::actionApproach() {
-        
-    }
-
     /**
      * Check whether the robot has gripped the ball or not
      */
@@ -113,7 +92,10 @@ namespace lab_tricolor {
      * Describe the gripping action
      */
     void LabNode::actionGrip() {
-
+        // BaxterAction msg;
+        // msg.component = side +"_gripper";
+        // msg.action = msg.CMD_GRIP;
+        // pub_gripper.publish(msg);
     }
 
     /**
@@ -165,7 +147,10 @@ namespace lab_tricolor {
      * Describe the release action
      */
     void LabNode::actionRelease() {
-
+        // BaxterAction msg;
+        // msg.component = side +"_gripper";
+        // msg.action = msg.CMD_RELEASE;
+        // pub_gripper.publish(msg);
     }
 }
 

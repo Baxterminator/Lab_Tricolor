@@ -16,6 +16,8 @@
   <depend>kdl_parser</depend>
   <depend>ament_index_cpp</depend>
   <depend>sensor_msgs</depend>
+  <depend>ecn_baxter</depend>
+
 
   <depend>frames</depend>
   <depend>urdf</depend>

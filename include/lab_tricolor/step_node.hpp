@@ -43,16 +43,11 @@ namespace lab_tricolor {
         }
         void action(E actual_step) {
             if (action_map.count(actual_step)){
-            //typename std::map<E, afunc>::const_iterator pos = action_map.find(actual_step);
                 std::cout << "in action" << std::endl;
 
                 auto f = action_map.at(actual_step);
                 f();
             }
-            // if(pos!=action_map.end()){
-            //     auto f = action_map.at(actual_step);
-            //     f();
-            //     }
         }
 
         void iterate_step() {
@@ -70,8 +65,8 @@ namespace lab_tricolor {
         const float pi = 3.1415926;
         const int x_center = 320 ; //x_offset: 320 -> 640/2
         const int y_center = 200 ;  //y_offset: 200 -> 400/2
-        const double Zref = 0.14 ;       // TO DEF
-        const double Rref = pow(0.052545081824064255/pi,0.5) ;       // TO DEF
+        const double Zref = 0.14 ;
+        const double Rref = pow(0.052545081824064255/pi,0.5);
         
     };
 }

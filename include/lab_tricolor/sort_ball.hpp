@@ -25,24 +25,25 @@
 #include <Eigen/QR>    
 
 #include "lab_tricolor/step_node.hpp"
-//#include "lab_tricolor/eigen.h"
 #include "lab_tricolor/ik_client.h"
-#include "step_node.hpp"
+//#include "ecn_baxter/msg/BaxterAction.msg" //to make gripping easier
 
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/buffer.h"
 
 #include <map>
 
+
+
 namespace lab_tricolor {
 
     using namespace rclcpp;
+    //using ecn_baxter::msg::BaxterAction;
 
 
     enum Step {
         IDLE,
         T_SOURCE,
-        CENTERING,
         APPROACH,
         GRIP,
         T_DEST,
@@ -58,7 +59,6 @@ namespace lab_tricolor {
             check_map = {
                 {Step::IDLE, [this] () { return checkIdle();}},
                 {Step::T_SOURCE, [this] () { return checkTSource(); }},
-                {Step::CENTERING, [this] () { return checkCentering(); }},
                 {Step::APPROACH, [this] () { return checkApproach(); }},
                 {Step::GRIP, [this] () { return checkGrip(); }},
                 {Step::T_DEST, [this] () { return checkTDest(); }},
@@ -67,7 +67,6 @@ namespace lab_tricolor {
 
             action_map = {
                 {Step::T_SOURCE, [this] () { return actionTSource();}},
-                {Step::CENTERING, [this] () { return actionCentering();}},
                 {Step::APPROACH, [this] () { return actionApproach();}},
                 {Step::GRIP, [this] () { return actionGrip();}},
                 {Step::T_DEST, [this] () { return actionTDest();}},
@@ -100,6 +99,8 @@ namespace lab_tricolor {
             pub_command = create_publisher<baxter_core_msgs::msg::JointCommand>("robot/limb/"+side+"/joint_command", 1);   // topic + QoS
             timer = create_wall_timer(1000ms,    // rate
                                               [&](){if(command_ini){pub_command->publish(command);}});
+            //pub_gripper = create_publisher<BaxterAction>(topic_gripper, 1);
+            
             //initializing the service that compute the Jacobian (inverse, in this program) and the inverse kinematic (ik)
             jac_node.init("jac_node","/robot/" + side + "/jacobian");
             ik_node.init("ik_node","/ExternalTools/left/PositionKinematicsNode/IKService");
@@ -152,7 +153,7 @@ namespace lab_tricolor {
             if (act_step == Step::IDLE)
                 return Step::T_SOURCE;
             if (act_step == Step::T_SOURCE)
-                return Step::CENTERING;
+                return Step::APPROACH;
             return act_step;
         }
 
@@ -173,14 +174,12 @@ namespace lab_tricolor {
             return false;
         }
         virtual bool checkTSource() = 0;
-        virtual bool checkCentering() = 0;
         virtual bool checkApproach() = 0;
         virtual bool checkGrip() = 0;
         virtual bool checkTDest() = 0;
         virtual bool checkRelease() = 0;
 
         virtual void actionTSource() = 0;
-        virtual void actionCentering() = 0;
         virtual void actionApproach() = 0;
         virtual void actionGrip() = 0;
         virtual void actionTDest() = 0;
@@ -200,6 +199,9 @@ namespace lab_tricolor {
         rclcpp::TimerBase::SharedPtr timer;
         std::string topic_circle = "/robot/"+side+"_circle";
         const std::string topic_state = "/robot/joint_states";
+
+        //Publisher<BaxterAction>::SharedPtr pub_gripper;
+        std::string topic_gripper = "/baxter/action";
 
         ServiceNodeSync<lab_tricolor::srv::Jacobian> jac_node;
         ServiceNodeSync<baxter_core_msgs::srv::SolvePositionIK> ik_node;
