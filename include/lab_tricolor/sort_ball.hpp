@@ -97,7 +97,7 @@ namespace lab_tricolor {
                     state = *msg;
             });
             pub_command = create_publisher<baxter_core_msgs::msg::JointCommand>("robot/limb/"+side+"/joint_command", 1);   // topic + QoS
-            timer = create_wall_timer(1000ms,    // rate
+            timer = create_wall_timer(100ms,    // rate
                                               [&](){if(command_ini){pub_command->publish(command);}});
             //pub_gripper = create_publisher<BaxterAction>(topic_gripper, 1);
             
@@ -115,17 +115,17 @@ namespace lab_tricolor {
 
         }
 
-        inline Eigen::MatrixXd compute_Ls_inv(const double& x,const double& y,const double& z){
+        inline Eigen::MatrixXd compute_Ls_inv(const double& x,const double& y,const double& Z){
             // BUILDING LS AS AN EIGEN MATRIX (2,6) REFER TO VISUAL SERVOING COURSE
             std::vector<double> Ls_vectorl1={
-                -1/z,0,x/z,x*y,-(1+std::pow(x,2)),y
+                -1/Z,0,x/Z,x*y,-(1+std::pow(x,2)),y
             };
             std::vector<double> Ls_vectorl2={
-                0,-1/z,y/z,1+std::pow(y,2),-x*y,-x
+                0,-1/Z,y/Z,1+std::pow(y,2),-x*y,-x
             };
             Eigen::Matrix<double,2,6, Eigen::RowMajor> Ls ;
-            Ls << -1/z,0,x/z,x*y,-(1+std::pow(x,2)),y,
-            0,-1/z,y/z,1+std::pow(y,2),-x*y,-x;
+            Ls << -1/Z,0,x/Z,x*y,-(1+std::pow(x,2)),y,
+            0,-1/Z,y/Z,1+std::pow(y,2),-x*y,-x;
             std::cout << "Matrix Ls :" << Ls <<std::endl;
             // COMPUTING THE INVERSE : 
             Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> cqr(Ls);

@@ -62,11 +62,10 @@ namespace lab_tricolor {
         std::map<E, cfunc> check_map = std::map<E, cfunc>();
         std::map<E, afunc> action_map = std::map<E, afunc>();
         
-        const float pi = 3.1415926;
         const int x_center = 320 ; //x_offset: 320 -> 640/2
         const int y_center = 200 ;  //y_offset: 200 -> 400/2
-        const double Zref = 0.14 ;
-        const double Rref = pow(0.052545081824064255/pi,0.5);
+        const double Zref = 0.14 ; //0.14
+        const double Rref = pow(0.052545081824064255/M_PI,0.5);
         
     };
 }
