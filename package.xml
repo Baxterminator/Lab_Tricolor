@@ -5,7 +5,7 @@
   <version>0.0.1</version>
   <description>ECN ROS2 lab on sorting colored ball</description>
   <maintainer email="geoffrey.cote@centraliens-nantes.org">Geoffrey CÔTE</maintainer>
-  <maintainer email="timothee.corroenne@eleves.ec-nantes.fr">Timothée CORROËNNE</maintainer>
+  <maintainer email="timothee.corroenne@centraliens-nantes.org">Timothée CORROËNNE</maintainer>
   <maintainer email="chiara.de-saint-giniez--trinh@eleves.ec-nantes.fr">Chiara DE-SAINT-GINIEZ-TRINH</maintainer>
   <license>MIT</license>
 
@@ -22,6 +22,8 @@
   <depend>frames</depend>
   <depend>urdf</depend>
   <depend>tf2_ros</depend>
+  <depend>tf2</depend>
+
   <depend>robot_state_publisher</depend>
 
   <depend>Eigen3</depend>
