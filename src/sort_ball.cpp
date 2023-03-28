@@ -55,13 +55,10 @@ namespace lab_tricolor {
      */
     void LabNode::actionCentering() {
         auto twist_mat = computeTwistCenter();
-        std::cout <<"twist mat built : " <<twist_mat<<std::endl;
-        //auto req = std::make_shared<lab_tricolor::srv::Jacobian::Request>();
+        //std::cout <<"twist mat built : " <<twist_mat<<std::endl;
         lab_tricolor::srv::Jacobian::Request req;
         req.inverse = true;
         req.ee_frame = true;
-
-        RCLCPP_INFO(this->get_logger(), "start_array initialised");
         if(state.position.size()){      //check for initialisation of state variable
             get_pos(state,req,side);
             if(lab_tricolor::srv::Jacobian::Response res; jac_node.call(req, res)){
@@ -124,15 +121,15 @@ namespace lab_tricolor {
         baxter_core_msgs::srv::SolvePositionIK::Request req;
         std::vector<geometry_msgs::msg::PoseStamped> Poses;
         geometry_msgs::msg::PoseStamped PoseStamped;
-            //PoseStamped.pose.orientation = ?; //TO DO : The orientation need to be defined.
+            //TO DO : The orientation need to be defined.
+        //PoseStamped.pose.orientation = ?; 
         PoseStamped.pose.position.x = Point_to_get.x;
         PoseStamped.pose.position.y = Point_to_get.y;
         PoseStamped.pose.position.z = Point_to_get.z;
         Poses.push_back(PoseStamped);
         req.set__seed_mode(req.SEED_AUTO);
         req.set__pose_stamp(Poses);
-        if(baxter_core_msgs::srv::SolvePositionIK::Response res; ik_node.call(req, res))
-        {
+        if(baxter_core_msgs::srv::SolvePositionIK::Response res; ik_node.call(req, res)){
             // call to IK was successfull, check if the solution is valid
             if (res.is_valid[0]  ){
                 command.names = res.joints[0].name;
@@ -142,7 +139,6 @@ namespace lab_tricolor {
                     command.command[k] = res.joints[0].position[k];
                     command.set__mode(command.RAW_POSITION_MODE);
                 }
-                RCLCPP_INFO(this->get_logger(), "Publishing");
                 pub_command->publish(command);
             }
         }
