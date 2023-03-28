@@ -26,6 +26,10 @@ namespace lab_tricolor {
             step = static_cast<E>(0);
             timer = create_wall_timer(sample_time, std::bind(&StepNode<E>::iterate_step, this));
         }
+
+        constexpr auto static Zref = 0.14 *2; //0.14
+        const double Rref = pow(0.052545081824064255/M_PI,0.5)/2;
+
     private:
         // At init time, the robot arm is idling
         E step;
@@ -56,16 +60,16 @@ namespace lab_tricolor {
             std::cout << " Step after check: " << step << std::endl;
             action(step);
         }
+        
     protected:
         virtual E check_step(E act_step) = 0;
         inline void increment_step() { step = check_step(step); }
         std::map<E, cfunc> check_map = std::map<E, cfunc>();
         std::map<E, afunc> action_map = std::map<E, afunc>();
         
-        const int x_center = 320 ; //x_offset: 320 -> 640/2
-        const int y_center = 200 ;  //y_offset: 200 -> 400/2
-        const double Zref = 0.14 ; //0.14
-        const double Rref = pow(0.052545081824064255/M_PI,0.5);
+        //const int x_c = 320 ; //x_offset: 320 -> 640/2
+        //const int y_c = 200 ;  //y_offset: 200 -> 400/2
+        
         
     };
 }
