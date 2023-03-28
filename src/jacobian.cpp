@@ -22,7 +22,6 @@
 #include <Eigen/QR>
 
 #include "lab_tricolor/sort_ball.hpp"
-//#include "lab_tricolor/KDL_jacobian.hpp"
 #include <lab_tricolor/srv/jacobian.hpp>
 
 
@@ -64,8 +63,8 @@ std::unique_ptr<urdf::Model> initRSP()
     }
 
     // override rsp's options
-    auto rsp_arg{rclcpp::NodeOptions()
-            .arguments({"--ros-args", "-r", "__ns:=/robot", "-p", "robot_description:=" + xml})};
+    // auto rsp_arg{rclcpp::NodeOptions()
+    //         .arguments({"--ros-args", "-r", "__ns:=/robot", "-p", "robot_description:=" + xml})};
     //rsp = std::make_shared<robot_state_publisher::RobotStatePublisher>(rsp_arg);        robot state publisher : needed for sim, not for work on real robot ?
 
     auto model{std::make_unique<urdf::Model>()};
