@@ -107,7 +107,7 @@ namespace lab_tricolor {
             
             // initializing the service that compute the Jacobian (inverse, in this program) and the inverse kinematic (ik)
             jac_node.init("jac_node","/robot/" + side + "/jacobian");
-            ik_node.init("ik_node","/ExternalTools/left/PositionKinematicsNode/IKService");
+            ik_node.init("ik_node","/ExternalTools/" + side + "/PositionKinematicsNode/IKService");
  
             // Initialize command name / mode : 
             command.set__mode(command.POSITION_MODE);
@@ -203,6 +203,9 @@ namespace lab_tricolor {
         std::vector<std::string> vec_name_points;
         int index_point=0;
 
+        constexpr double static Zref = 0.14 *2; //0.14
+        const double Rref = pow(0.052545081824064255/M_PI,0.5)/2;
+
         /*
          * ################################################################
          *                   Some Utility Function
@@ -220,11 +223,6 @@ namespace lab_tricolor {
                 double Zmesured = pow(pow(Dmesured,2)-pow(x_cam/10,2)-pow(y_cam/10,2),0.5);
                 //std::cout<<"x:" <<circle.data[0]<<" y:"<<circle.data[1]<<" area:"<<circle.data[2] <<std::endl;
                 if(abs(circle.data[2])>0.00001){
-                    // std::cout<<"R_circle : "<< R_circle <<std::endl;
-                    // std::cout<<"R_ref : "<< Rref <<std::endl;
-                    // std::cout<<"D_mesured : "<< Dmesured <<std::endl;
-                    // std::cout<<"Zmesured : "<<Zmesured<<std::endl;
-                    // std::cout<<pow(Dmesured,2)<<" : "<<pow(x_cam/10,2)<<" : "<<pow(y_cam/10,2)<<std::endl;
                     Eigen::MatrixXd Ls_inv = compute_Ls_inv(x_cam/Zmesured,y_cam/Zmesured,Zmesured);
                     Eigen::Matrix<double,6,1> twist_mat = -lambda_cent*Ls_inv*e;
                     // We only 
