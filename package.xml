@@ -2,11 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>lab_tricolor</name>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <description>ECN ROS2 lab on sorting colored ball</description>
   <maintainer email="geoffrey.cote@centraliens-nantes.org">Geoffrey CÔTE</maintainer>
   <maintainer email="timothee.corroenne@centraliens-nantes.org">Timothée CORROËNNE</maintainer>
-  <maintainer email="chiara.de-saint-giniez--trinh@eleves.ec-nantes.fr">Chiara DE-SAINT-GINIEZ-TRINH</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
