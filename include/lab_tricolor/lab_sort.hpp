@@ -1,7 +1,3 @@
-//
-// Created by gcote2021 on 26/01/23.
-//
-
 #ifndef BUILD_SORT_BALL_H
 #define BUILD_SORT_BALL_H
 

@@ -1,8 +1,4 @@
-//
-// Created by gcote2021 on 26/01/23.
-//
-
-#include "lab_tricolor/sort_ball.hpp"
+#include "lab_tricolor/lab_sort.hpp"
 #include <geometry_msgs/msg/detail/point__struct.hpp>
 #include <memory>
 
