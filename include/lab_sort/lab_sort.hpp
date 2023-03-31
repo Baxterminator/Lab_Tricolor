@@ -162,7 +162,7 @@ namespace lab_sort {
 
         virtual void actionTSource() = 0;
         virtual void actionCentering() = 0;
-        virtual void actionAprroach() = 0;
+        virtual void actionApproach() = 0;
         virtual void actionGrip() = 0;
         virtual void actionTDest() = 0;
         virtual void actionRelease() = 0;
