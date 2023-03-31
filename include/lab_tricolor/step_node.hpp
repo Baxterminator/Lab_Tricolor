@@ -26,6 +26,7 @@ namespace lab_tricolor {
             step = static_cast<E>(0);
             timer = create_wall_timer(sample_time, std::bind(&StepNode<E>::iterate_step, this));
         }
+
     private:
         // At init time, the robot arm is idling
         E step;
@@ -34,7 +35,7 @@ namespace lab_tricolor {
 
         E check(E actual_step) {
             if (const auto it = check_map.find(actual_step); it != check_map.end()) {
-                std::cout<<"checked"<<std::endl;
+                //std::cout<<"checked"<<std::endl;
                 auto f = check_map.at(actual_step);
                 if (f())
                     increment_step();
@@ -43,7 +44,7 @@ namespace lab_tricolor {
         }
         void action(E actual_step) {
             if (action_map.count(actual_step)){
-                std::cout << "in action" << std::endl;
+                //std::cout << "in action" << std::endl;
 
                 auto f = action_map.at(actual_step);
                 f();
@@ -51,23 +52,17 @@ namespace lab_tricolor {
         }
 
         void iterate_step() {
-            std::cout << "Actual step : " << step << std::endl;
+            //std::cout << "Actual step : " << step << std::endl;
             step = check(step);
-            std::cout << " Step after check: " << step << std::endl;
+            //std::cout << " Step after check: " << step << std::endl;
             action(step);
         }
+        
     protected:
         virtual E check_step(E act_step) = 0;
         inline void increment_step() { step = check_step(step); }
         std::map<E, cfunc> check_map = std::map<E, cfunc>();
         std::map<E, afunc> action_map = std::map<E, afunc>();
-        
-        const float pi = 3.1415926;
-        const int x_center = 320 ; //x_offset: 320 -> 640/2
-        const int y_center = 200 ;  //y_offset: 200 -> 400/2
-        const double Zref = 0.14 ;
-        const double Rref = pow(0.052545081824064255/pi,0.5);
-        
     };
 }
 
