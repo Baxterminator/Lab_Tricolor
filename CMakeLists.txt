@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(lab_sort_p)
+project(lab_sort)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -35,9 +35,9 @@ macro(add_message node_name)
     endif()
 endmacro()
  
-ament_auto_add_executable(lab_sort src/lab_sort.cpp)
-target_include_directories(lab_sort PRIVATE include)
-add_message(lab_sort)
+ament_auto_add_executable(lab_sort_ src/lab_sort.cpp)
+target_include_directories(lab_sort_ PRIVATE include)
+add_message(lab_sort_)
 
 ament_auto_add_executable(jacobian src/jacobian.cpp)
 target_include_directories(jacobian PRIVATE include)

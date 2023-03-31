@@ -9,7 +9,7 @@
 #include <chrono>
 #include <iostream>
 
-namespace lab_tricolor {
+namespace lab_sort {
 
     using namespace rclcpp;
     using namespace std::chrono_literals;

@@ -1,9 +1,3 @@
-//
-// Created by tcorroenne2021 on 08/02/23.
-// Modified by B on 08/03/23.
-//  <depend>kdl_parser</depend>
-
-
 #include "rclcpp/rclcpp.hpp"
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -21,12 +15,12 @@
 #include <robot_state_publisher/robot_state_publisher.hpp>
 #include <Eigen/QR>
 
-#include "lab_tricolor/sort_ball.hpp"
-#include <lab_tricolor/srv/jacobian.hpp>
+#include "lab_sort/lab_sort.hpp"
+#include <lab_sort/srv/jacobian.hpp>
 
 
 
-using lab_tricolor::srv::Jacobian;
+using lab_sort::srv::Jacobian;
 using JacReq = Jacobian::Request::SharedPtr;
 using JacRes = Jacobian::Response::SharedPtr;
 
@@ -72,7 +66,7 @@ std::unique_ptr<urdf::Model> initRSP()
     return model;
 }
 
-namespace lab_tricolor {
+namespace lab_sort {
     class Jacobian_node : public rclcpp::Node{
         public:
             Jacobian_node(rclcpp::NodeOptions options) : Node("jac_name", options){
@@ -135,8 +129,8 @@ namespace lab_tricolor {
 
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
-    //rclcpp::spin(std::make_shared<lab_tricolor::Jacobian_node>(rclcpp::NodeOptions{}));
-    std::shared_ptr<rclcpp::Node> node = std::make_shared<lab_tricolor::Jacobian_node>(rclcpp::NodeOptions{});
+    //rclcpp::spin(std::make_shared<lab_sort::Jacobian_node>(rclcpp::NodeOptions{}));
+    std::shared_ptr<rclcpp::Node> node = std::make_shared<lab_sort::Jacobian_node>(rclcpp::NodeOptions{});
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;

@@ -9,7 +9,7 @@
 #include <Eigen/Core>
 #include <Eigen/QR>
 #include "sensor_msgs/msg/joint_state.hpp"
-#include <lab_tricolor/srv/jacobian.hpp>
+#include <lab_sort/srv/jacobian.hpp>
 
 // This file aims to reduce the number of function written in the rest of the lab.
 
@@ -33,7 +33,7 @@ inline Eigen::MatrixXd compute_Ls_inv(const double& x,const double& y,const doub
     return Ls_inverse;
 }
 
-inline void get_pos(sensor_msgs::msg::JointState s, lab_tricolor::srv::Jacobian_Request &req,std::string side){
+inline void get_pos(sensor_msgs::msg::JointState s, lab_sort::srv::Jacobian_Request &req,std::string side){
     int start_array = 2;
     if(side=="right"){
     start_array = 9;

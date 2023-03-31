@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>lab_sort_p</name>
+  <name>lab_sort</name>
   <version>1.0.0</version>
   <description>ECN ROS2 lab on sorting colored ball</description>
   <maintainer email="geoffrey.cote@centraliens-nantes.org">Geoffrey CÔTE</maintainer>

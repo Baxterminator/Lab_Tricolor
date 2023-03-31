@@ -1,12 +1,12 @@
-#include "lab_tricolor/lab_sort.hpp"
+#include "lab_sort/lab_sort.hpp"
 #include <geometry_msgs/msg/detail/point__struct.hpp>
 #include <memory>
 
-namespace lab_tricolor {
+namespace lab_sort {
 
-    class LabNode : public SortBall {
+    class LabNode : public LabSort {
         public:
-            LabNode(NodeOptions opts) : SortBall(opts) {
+            LabNode(NodeOptions opts) : LabSort(opts) {
 
             }
         protected:
@@ -52,12 +52,12 @@ namespace lab_tricolor {
     void LabNode::actionCentering() {
         auto twist_mat = computeTwistCenter();
         //std::cout <<"twist mat built : " <<twist_mat<<std::endl;
-        lab_tricolor::srv::Jacobian::Request req;
+        lab_sort::srv::Jacobian::Request req;
         req.inverse = true;
         req.ee_frame = true;
         if(state.position.size()){      //check for initialisation of state variable
             get_pos(state,req,side);
-            if(lab_tricolor::srv::Jacobian::Response res; jac_node.call(req, res)){
+            if(lab_sort::srv::Jacobian::Response res; jac_node.call(req, res)){
                 command.set__mode(command.VELOCITY_MODE);
                 auto com = computeCommand(res.jacobian,twist_mat);
                 command.set__command(com);
@@ -159,7 +159,7 @@ namespace lab_tricolor {
 
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<lab_tricolor::LabNode>(rclcpp::NodeOptions{}));
+    rclcpp::spin(std::make_shared<lab_sort::LabNode>(rclcpp::NodeOptions{}));
     rclcpp::shutdown();
     return 0;
 }

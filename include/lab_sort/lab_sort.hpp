@@ -1,12 +1,12 @@
 #ifndef BUILD_SORT_BALL_H
 #define BUILD_SORT_BALL_H
 
+
+#include "rclcpp/rclcpp.hpp"
+
 #include <geometry_msgs/msg/detail/point__struct.hpp>
 #include <iterator>
 #include <vector>
-
-
-#include "rclcpp/rclcpp.hpp"
 
 
 #include <geometry_msgs/msg/twist.hpp>
@@ -16,10 +16,10 @@
 #include "baxter_core_msgs/srv/solve_position_ik.hpp"
 #include "geometry_msgs/msg/point.hpp"
 
-#include <lab_tricolor/utilities.hpp>
-#include <lab_tricolor/srv/jacobian.hpp>
-#include "lab_tricolor/step_node.hpp"
-#include "lab_tricolor/ik_client.h"
+#include <lab_sort/utilities.hpp>
+#include <lab_sort/srv/jacobian.hpp>
+#include "lab_sort/step_node.hpp"
+#include "lab_sort/ik_client.h"
 
 //#include "ecn_baxter/msg/BaxterAction.msg" //to make gripping easier
 
@@ -32,7 +32,7 @@
 
 
 
-namespace lab_tricolor {
+namespace lab_sort {
 
     using namespace rclcpp;
     //using ecn_baxter::msg::BaxterAction;
@@ -49,9 +49,9 @@ namespace lab_tricolor {
 
     const std::vector<std::string> suffixes = {"_s0", "_s1", "_e0", "_e1", "_w0", "_w1", "_w2"};
 
-    class SortBall : public StepNode<Step> {
+    class LabSort : public StepNode<Step> {
     public:
-        explicit SortBall(NodeOptions opts) : StepNode<Step>("sort_ball", opts) {
+        explicit LabSort(NodeOptions opts) : StepNode<Step>("lab_sort", opts) {
 
             check_map = {
                 {Step::IDLE, [this] () { return checkIdle();}},
@@ -189,7 +189,7 @@ namespace lab_tricolor {
         //Publisher<BaxterAction>::SharedPtr pub_gripper;
         std::string topic_gripper = "/baxter/action";
 
-        ServiceNodeSync<lab_tricolor::srv::Jacobian> jac_node;
+        ServiceNodeSync<lab_sort::srv::Jacobian> jac_node;
         ServiceNodeSync<baxter_core_msgs::srv::SolvePositionIK> ik_node;
 
         std::shared_ptr<tf2_ros::TransformListener> tf_listener{nullptr}; // subscribes to /tf
