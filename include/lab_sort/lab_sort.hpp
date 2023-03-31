@@ -72,8 +72,8 @@ namespace lab_sort {
 
             this->declare_parameter("side", "left");
             side = this->get_parameter("side").get_parameter_value().get<std::string>();
-            
-            topic_circle = "/robot/"+side+"_circle";
+            this->declare_parameter("topic", "/robot/"+side+"_circle");
+            topic_circle = this->get_parameter("topic").get_parameter_value().get<std::string>();
 
             // To get to centering fast (debug only)
             increment_step();
