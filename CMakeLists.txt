@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(lab_tricolor)
+project(lab_sort_p)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -13,7 +13,6 @@ ament_auto_find_build_dependencies()
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIRS})
 add_definitions(${EIGEN3_DEFINITIONS})
-#find_package(orocos_kdl REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME} "srv/Jacobian.srv")
 ament_export_dependencies(rosidl_default_runtime)
@@ -36,16 +35,13 @@ macro(add_message node_name)
     endif()
 endmacro()
  
-ament_auto_add_executable(sort_ball src/sort_ball.cpp)
-target_include_directories(sort_ball PRIVATE include)
-add_message(sort_ball)
+ament_auto_add_executable(lab_sort src/lab_sort.cpp)
+target_include_directories(lab_sort PRIVATE include)
+add_message(lab_sort)
 
 ament_auto_add_executable(jacobian src/jacobian.cpp)
 target_include_directories(jacobian PRIVATE include)
 
 add_message(jacobian)
-
-#target_link_libraries(jacobian orocos_kdl)
-
 
 ament_auto_package()
